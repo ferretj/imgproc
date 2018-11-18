@@ -14,4 +14,3 @@ def show(img, size=None, redux=1.):
 	plt.imshow(img)
 	plt.tick_params(left=None, bottom=None, labelleft=None, labelbottom=None)
 	plt.show()
-
