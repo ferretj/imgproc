@@ -22,6 +22,6 @@ def alternate_uniform_sample(elems, size=1):
 	samples = []
 	for i in range(n_samples):
 		k = (start + i) % n
-		sample = np.choice(elems[k])
+		sample = np.random.choice(elems[k])
 		samples.append(sample) 
 	return samples

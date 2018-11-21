@@ -1,4 +1,5 @@
 from copy import deepcopy
+from imgproc.scan import background_color
 from imgproc.utils import numpy_to_pil, pil_to_numpy
 from PIL import ImageEnhance, ImageFilter, ImageOps
 
@@ -52,25 +53,36 @@ def blur(img, radius=2.):
 
 # if (xmod = 2, ymod = 0) then xstart = 2, xend = h
 # TODO: test on real example
-def translate(img, xmod, ymod, mode='mirror'):
+def translate(img, xmod, ymod, fill='background', fill_value=None):
 	h, w = img.shape[:2]
 	img_mod = np.zeros_like(img).astype(np.uint8)
-	# copy of the image
+	# translating the image
 	xstart, xend, nxstart, nxend = max(0, -xmod), min(h, h - xmod), max(0, xmod), min(h, h + xmod)
 	ystart, yend, nystart, nyend = max(0, -ymod), min(w, w - ymod), max(0, ymod), min(w, w + ymod)
 	img_mod[nxstart: nxend, nystart: nyend] = img[xstart: xend, ystart: yend]
-	# processing part
-	if mode == 'zero':
+	# processing missing values in translated image
+	if fill_value is not None:
+		img_mod[:nxstart] = fill_value
+		img_mod[nxend:] = fill_value
+		img_mod[:, :nystart] = fill_value
+		img_mod[:, nyend:] = fill_value
+	elif fill == 'black':
 		img_mod[:nxstart] = 0
 		img_mod[nxend:] = 0
 		img_mod[:, :nystart] = 0
 		img_mod[:, nyend:] = 0
-	elif mode == 'ones':
+	elif fill == 'white':
 		img_mod[:nxstart] = 255
 		img_mod[nxend:] = 255
 		img_mod[:, :nystart] = 255
 		img_mod[:, nyend:] = 255
-	elif mode == 'mirror':
+	elif fill == 'background':
+		bg_color = np.array(background_color(im)) 
+		img_mod[:nxstart] = bg_color
+		img_mod[nxend:] = bg_color
+		img_mod[:, :nystart] = bg_color
+		img_mod[:, nyend:] = bg_color
+	elif fill == 'mirror':
 		img_mod[:nxstart] = img[:nxstart:-1]
 		img_mod[nxend:] = img[nxend::-1]
 		img_mod[:, :nystart] = img[:, :nystart:-1]

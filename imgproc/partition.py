@@ -27,15 +27,16 @@ class Band:
 #            or is it only a view (in that case, do not really need slice attribute in Band)
 class BandDivider:
 
-	def __init__(self, img, indices=None, btype='horizontal'):
+	def __init__(self, img, indices, btype='horizontal'):
 		self.img = img
 		self.indices = indices
 		self.btype = btype
+		self.bands = self._divide_into_bands()
 
 	def __getitem__(self, i):
 		if i > self.n_bands - 1:
 			raise IndexError('Exceeded actual amount of bands.')
-		return self.get_band(i)
+		return self.bands[i]
 
 	def __len__(self):
 		return self.n_bands
@@ -44,32 +45,38 @@ class BandDivider:
 	def n_bands(self):
 		if self.indices is None:
 			raise TypeError('Must define band indices first.')
-		return len(indices) + 1
+		return len(self.indices) + 1
 
-	def get_band(self, i):
+	def _divide_into_bands(self):
+		bands = []
+		for i in self.n_bands:
+			bands.append(self._get_band(i))
+		return bands
+
+	def _get_band(self, i):
 		nb = self.n_bands
 		if self.btype == 'horizontal':
 			if i == 0:
-				return img[:self.indices[0]]
+				return Band(self.img[:self.indices[0]])
 			elif i == nb - 1:
-				return img[self.indices[-1]:]
+				return Band(self.img[self.indices[-1]:])
 			else:
-				return img[self.indices[i - 1]: self.indices[i]]
+				return Band(self.img[self.indices[i - 1]: self.indices[i]])
 		elif self.btype == 'vertical':
 			if i == 0:
-				return img[:, :self.indices[0]]
+				return Band(self.img[:, :self.indices[0]])
 			elif i == nb - 1:
-				return img[:, self.indices[-1]:]
+				return Band(self.img[:, self.indices[-1]:])
 			else:
-				return img[:, self.indices[i - 1]: self.indices[i]]
+				return Band(self.img[:, self.indices[i - 1]: self.indices[i]])
 		else:
 			err = 'Only `horizontal` and `vertical` modes are supported at the moment.'
 			raise NotImplementedError(err)
 
 	def stitch(self):
 		if self.btype == 'horizontal':
-			return np.stack([band.data for band in self], axis=0)
+			return np.stack([band.data for band in self.bands], axis=0)
 		elif self.btype == 'vertical':
-			return np.stack([band.data for band in self], axis=1)
+			return np.stack([band.data for band in self.bands], axis=1)
 		else:
 			raise NotImplementedError
