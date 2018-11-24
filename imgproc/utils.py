@@ -1,5 +1,8 @@
+import math
 import numpy as np
 from PIL import Image
+
+GOLD_NB = (1. + math.sqrt(5)) / 2
 
 
 def numpy_to_pil(img):

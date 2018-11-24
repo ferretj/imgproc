@@ -1,35 +1,32 @@
 import numpy as np
 
 
-# TODO: can use a better pattern to manage the mod attribute
 class Band:
 
-	def __init__(self, img, img_slice):
+	def __init__(self, img):
 		self.img = img
-		self.img_slice = img_slice
-		self.mod = None
+
+	def __len__(self):
+		return len(self.img)
 
 	# mfunc for morphing function ? better name ?
 	def apply(self, mfunc):
-		if self.mod is None:
-			self.mod = mfunc(self.img[self.img_slice])
-		else:
-			self.mod = mfunc(self.mod)
+		self.img = mfunc(self.img)
 
 	@property
-	def data(self):
-		if self.mod is None:
-			return self.img[self.img_slice]
-		return self.mod
-
+	def shape(self):
+		return self.img.shape
+	
 
 # question : does it take additional memory to give Band an indexed numpy array
 #            or is it only a view (in that case, do not really need slice attribute in Band)
+# answer : no copy but have to be careful not to erase original values in image
 class BandDivider:
 
 	def __init__(self, img, indices, btype='horizontal'):
 		self.img = img
 		self.indices = indices
+		self._remove_duplicates(sort=True)
 		self.btype = btype
 		self.bands = self._divide_into_bands()
 
@@ -47,11 +44,13 @@ class BandDivider:
 			raise TypeError('Must define band indices first.')
 		return len(self.indices) + 1
 
+	def _remove_duplicates(self, sort=False):
+		self.indices = np.array(list(set(self.indices)))
+		if sort:
+			self.indices.sort()
+
 	def _divide_into_bands(self):
-		bands = []
-		for i in self.n_bands:
-			bands.append(self._get_band(i))
-		return bands
+		return [self._get_band(i) for i in range(self.n_bands)]
 
 	def _get_band(self, i):
 		nb = self.n_bands
@@ -75,8 +74,11 @@ class BandDivider:
 
 	def stitch(self):
 		if self.btype == 'horizontal':
-			return np.stack([band.data for band in self.bands], axis=0)
+			# print('Printing shapes :\n')
+			# for i, band in enumerate(self.bands):
+			# 	print('Band {} : {}'.format(i + 1, band.shape))
+			return np.concatenate([band.img for band in self.bands], axis=0)
 		elif self.btype == 'vertical':
-			return np.stack([band.data for band in self.bands], axis=1)
+			return np.concatenate([band.img for band in self.bands], axis=1)
 		else:
 			raise NotImplementedError

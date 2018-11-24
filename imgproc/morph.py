@@ -1,6 +1,7 @@
 from copy import deepcopy
-from imgproc.scan import background_color
+from imgproc.scan import background_color, num_hash
 from imgproc.utils import numpy_to_pil, pil_to_numpy
+import numpy as np
 from PIL import ImageEnhance, ImageFilter, ImageOps
 
 
@@ -105,4 +106,11 @@ def to_channel(img, channel='r'):
 	else:
 		err = 'channel argument must be one of `r`, `g` or `b`.'
 		raise ValueError(err)
+	return img_mod
+
+
+def map_pixval(img, pix_start, pix_end):
+	img_mod = deepcopy(img)
+	imgh, pval = num_hash(img_mod), num_hash(pix_start)
+	img_mod[imgh == pval] = pix_end
 	return img_mod
