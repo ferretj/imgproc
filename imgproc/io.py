@@ -43,7 +43,7 @@ def identify_format(imgfile):
 		else:
 			ftype = None
 	if ftype is None:
-		raise ValueError('Unrecognized file format.')
+		raise IOError('Unrecognized file format.')
 	return ftype
 
 

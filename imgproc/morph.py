@@ -2,7 +2,7 @@ from copy import deepcopy
 from imgproc.scan import background_color, num_hash
 from imgproc.utils import numpy_to_pil, pil_to_numpy
 import numpy as np
-from PIL import ImageEnhance, ImageFilter, ImageOps
+from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 
 
 def modify_vividness(img, factor):
@@ -113,4 +113,59 @@ def map_pixval(img, pix_start, pix_end):
 	img_mod = deepcopy(img)
 	imgh, pval = num_hash(img_mod), num_hash(pix_start)
 	img_mod[imgh == pval] = pix_end
+	return img_mod
+
+
+#TODO: replace PIL functions by own functions !!
+def pixelate(img):
+	img_mod = numpy_to_pil(img)
+	img_size = img_mod.size
+
+    # boost saturation of image 
+    sat_booster = ImageEnhance.Color(img_mod)
+    img_mod = sat_booster.enhance(float(kwargs.get("saturation", 1.25)))
+
+    # increase contrast of image
+    contr_booster = ImageEnhance.Contrast(img_mod)
+    img_mod = contr_booster.enhance(float(kwargs.get("contrast", 1.2)))
+
+    # reduce the number of colors used in picture
+    img_mod = img_mod.convert('P', palette=Image.ADAPTIVE, colors=int(kwargs.get("n_colors", 10)))
+
+    # reduce image size
+    superpixel_size = int(kwargs.get("superpixel_size", 10))
+    reduced_size = (img_size[0] // superpixel_size, img_size[1] // superpixel_size)
+    img_mod = img_mod.resize(reduced_size, Image.BICUBIC)
+
+    # resize to original shape to give pixelated look
+    img_mod = img_mod.resize(img_size, Image.BICUBIC)
+    
+    return img_mod
+
+
+# similar to numpy sort but with an additional key argument
+# key can either be a function or a 1D array / 2D matrix with values
+def sort(img, key, order='increasing'):
+	if callable(key):
+		try:
+			vals = key(img)
+		except:
+			h, w = img.shape[:2]
+			vals = np.array([key(img[i, j]) for i in range(h) for j in range(w)])
+	elif type(key) is np.ndarray:
+		vals = key
+	
+	if vals.ndim == 1:
+		indices = np.argsort(vals)
+	elif vals.ndim == 2:
+		indices = np.argsort(np.ravel(vals))
+	else:
+		raise ValueError('Indices for sorting should be a 1d or 2d array.')
+	
+	if order == 'reverse' or order == 'decreasing':
+		indices = indices[::-1]
+
+	img_mod = deepcopy(img).reshape(img.shape[0] * img.shape[1], img.shape[2])
+	img_mod = img.mod[indices].reshape(img.shape[0], img.shape[1], img.shape[2])
+	
 	return img_mod
