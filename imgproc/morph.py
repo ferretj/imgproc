@@ -121,26 +121,26 @@ def pixelate(img):
 	img_mod = numpy_to_pil(img)
 	img_size = img_mod.size
 
-    # boost saturation of image 
-    sat_booster = ImageEnhance.Color(img_mod)
-    img_mod = sat_booster.enhance(float(kwargs.get("saturation", 1.25)))
+	# boost saturation of image 
+	sat_booster = ImageEnhance.Color(img_mod)
+	img_mod = sat_booster.enhance(float(kwargs.get("saturation", 1.25)))
 
-    # increase contrast of image
-    contr_booster = ImageEnhance.Contrast(img_mod)
-    img_mod = contr_booster.enhance(float(kwargs.get("contrast", 1.2)))
+	# increase contrast of image
+	contr_booster = ImageEnhance.Contrast(img_mod)
+	img_mod = contr_booster.enhance(float(kwargs.get("contrast", 1.2)))
 
-    # reduce the number of colors used in picture
-    img_mod = img_mod.convert('P', palette=Image.ADAPTIVE, colors=int(kwargs.get("n_colors", 10)))
+	# reduce the number of colors used in picture
+	img_mod = img_mod.convert('P', palette=Image.ADAPTIVE, colors=int(kwargs.get("n_colors", 10)))
 
-    # reduce image size
-    superpixel_size = int(kwargs.get("superpixel_size", 10))
-    reduced_size = (img_size[0] // superpixel_size, img_size[1] // superpixel_size)
-    img_mod = img_mod.resize(reduced_size, Image.BICUBIC)
+	# reduce image size
+	superpixel_size = int(kwargs.get("superpixel_size", 10))
+	reduced_size = (img_size[0] // superpixel_size, img_size[1] // superpixel_size)
+	img_mod = img_mod.resize(reduced_size, Image.BICUBIC)
 
-    # resize to original shape to give pixelated look
-    img_mod = img_mod.resize(img_size, Image.BICUBIC)
-    
-    return img_mod
+	# resize to original shape to give pixelated look
+	img_mod = img_mod.resize(img_size, Image.BICUBIC)
+	
+	return img_mod
 
 
 # similar to numpy sort but with an additional key argument

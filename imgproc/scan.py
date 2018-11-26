@@ -1,13 +1,6 @@
 from collections import Counter
-from imgproc.utils import is_iterable, hex_to_rgb, rgb_to_hex
+from imgproc.utils import is_iterable, is_rgb_image, hex_to_rgb, rgb_to_hex
 import numpy as np
-
-
-def is_rgb_image(obj):
-	if hasattr(obj, 'dtype'):
-		if obj.ndim == 3 and obj.dtype == 'uint8':
-			return True
-	return False
 
 
 def has_values_in_range(arr, vmin=0, vmax=256):
