@@ -169,3 +169,30 @@ def sort(img, key, order='increasing'):
 	img_mod = img.mod[indices].reshape(img.shape[0], img.shape[1], img.shape[2])
 	
 	return img_mod
+
+
+# from https://twitter.com/kGolid/status/1060841706105507840
+def pixelsort(img)
+	# select some starting pixel pst
+	# draw randomly from neighborhood of processed pixels
+	# pick the farthest from pst -> P
+	# draw randomly from unprocessed
+	# pick the most similar to the processed neighbor of P ->
+	# swap P and S
+	h, w = img.shape[:2]
+	img_mod = deepcopy(img)
+	x_start, y_start = np.random.randint(h), np.random.randint(w)
+	orig = (x_start, y_start)
+	proc = set(orig)
+	unproc = set([(i, j) for i in range(h) for j in range(w)]) - proc
+	neigh = set((x_start - 1, y_start),
+				(x_start + 1, y_start),
+				(x_start, y_start - 1),
+				(x_start, y_start + 1))
+	sources = sample_from_set(neigh, size=4)
+	src = sources[np.argmax([dist(cd, orig) for cd in sources])]
+	dests = sample_from_set(unproc, size=4)
+	dst = dests[np.argmax([sim(cd, src) for cd in dests])]
+	img_mod[src[0], src[1]], img_mod[dst[0], dst[1]] = img_mod[dst[0], dst[1]], img_mod[src[0], src[1]]
+	proc.add(src)
+	unproc.remove(src)

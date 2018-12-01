@@ -161,3 +161,10 @@ def make_filecopy(f, return_dest=False):
 	shutil.copy2(f, dest)
 	if return_dest:
 		return dest
+
+
+def hilo(a, b, c):
+    if c < b: b, c = c, b
+    if b < a: a, b = b, a
+    if c < b: b, c = c, b
+    return a + c
