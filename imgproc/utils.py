@@ -7,6 +7,7 @@ from PIL import Image
 import shutil
 
 GOLD_NB = (1. + math.sqrt(5)) / 2
+HEX_CHARS = list(range(10)) + list('abcdef')
 JPG_ALIASES = ['jpg', 'jpeg', 'JPG', 'JPEG']
 PNG_ALIASES = ['png', 'PNG']
 
@@ -93,6 +94,8 @@ def rgb_to_hex(rgb):
 	return '#%02x%02x%02x' % rgb
 
 
+# converts 2-sized hexadecimal to number
+# ex : ff -> 255
 def hex_to_num(hexa):
 	assert len(hexa) == 2
 	return int(hexa, 16)
@@ -140,12 +143,11 @@ def check_imgfile_arg(imgfile, ftype=None):
 def check_hexadecimal(obj):
 
 	def is_hexa_char(c):
-		hex_chars = 'abcdef'
 		if not isinstance(c, str):
 			raise TypeError('The argument must be a single character (not str here).')
 		elif len(c) != 1:
 			raise IndexError('The argument must be a single character (several here).')
-		elif c.isdigit() or c in hex_chars:
+		elif c in HEX_CHARS:
 			return True
 		return False
 
@@ -168,3 +170,12 @@ def hilo(a, b, c):
     if b < a: a, b = b, a
     if c < b: b, c = c, b
     return a + c
+
+
+def hex_chars():
+	return HEX_CHARS
+
+
+def img_to_2d_num_hash(img):
+	check_img_arg(img)
+	return img[..., 0] + 256 * img[..., 1] + (256 ** 2) * img[..., 2]

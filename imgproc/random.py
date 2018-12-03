@@ -1,4 +1,4 @@
-from imgproc.utils import is_iterable
+from imgproc.utils import hex_chars, is_iterable
 import numpy as np
 import random
 
@@ -23,13 +23,6 @@ def sample_from_array(elems, size=1, weights=None):
 	return list(np.random.choice(elems, size=size, p=weights))
 
 
-def _sample_from_dict_once(d):
-	dres = dict()
-	for item, elems in d.items():
-		dres[item] = np.random.choice(elems)
-	return dres
-
-
 def sample_from_arrays_alternating(elems, size=1):
 	n = len(elems)
 	n_samples = sampling_amount(size)
@@ -42,6 +35,13 @@ def sample_from_arrays_alternating(elems, size=1):
 	return samples
 
 
+def _sample_from_dict_once(d):
+	dres = dict()
+	for item, elems in d.items():
+		dres[item] = np.random.choice(elems)
+	return dres
+
+
 # space is a dictionary
 def sample_from_dict(d, size=1):
 	n_samples = sampling_amount(size)
@@ -49,3 +49,11 @@ def sample_from_dict(d, size=1):
 	for _ in range(n_samples):
 		samples.append(_sample_from_dict_once(d))
 	return samples
+
+
+def random_hex(size):
+	return np.random.choice(hex_chars(), size)
+
+
+def random_color():
+	return np.random.randint(256, size=(3,))
