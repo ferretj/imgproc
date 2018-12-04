@@ -7,7 +7,7 @@ from PIL import Image
 import shutil
 
 GOLD_NB = (1. + math.sqrt(5)) / 2
-HEX_CHARS = list(range(10)) + list('abcdef')
+HEX_CHARS = [str(d) for d in range(10)] + list('abcdef')
 JPG_ALIASES = ['jpg', 'jpeg', 'JPG', 'JPEG']
 PNG_ALIASES = ['png', 'PNG']
 
@@ -31,6 +31,18 @@ def pil_to_numpy(pil_img, from_grayscale=False):
 		raise ValueError('Pixel values should be between 0 and 255 (included).')
 	img = img.astype(np.uint8)
 	return img
+
+
+def is_color(col):
+	if not is_iterable(col):
+		return False
+	elif len(col) != 3:
+		return False
+	elif np.min(col) < 0:
+		return False
+	elif np.max(col) > 255:
+		return False
+	return True
 
 
 def is_iterable(obj):
@@ -110,6 +122,11 @@ def hex_to_rgb(hexa):
 			   '(not counting `#` at the beginning).')
 		raise IndexError(''.join(err))
 	return tuple(hex_to_num(hexa[i: i + 2]) for i in (0, 2 ,4))
+
+
+def check_color(col):
+	if not is_color(col):
+		raise TypeError('Invalid color argument.')
 
 
 #TODO: add PIL format into account if needed

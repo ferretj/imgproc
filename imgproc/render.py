@@ -5,6 +5,7 @@ DEF_CELLSIZE = 6.
 DEF_FIGSIZE = 10.
 
 
+#TODO: does not work really well for wider images 
 def show(img, size=None, redux=1.):
 	if img.ndim == 2:
 		print('WARNING: colormap applied (since displaying a two-dim image)')
@@ -36,3 +37,9 @@ def grid(imgs, size=None, redux=1.):
 		grid[i].imshow(img)
 	plt.tick_params(left=None, bottom=None, labelleft=None, labelbottom=None)
 	plt.show()
+
+
+# experimental : frame creations 
+# ideas : write parameters inside canvas ? write img ID ?
+def frame(img):
+	return img

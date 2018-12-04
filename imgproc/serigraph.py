@@ -13,6 +13,7 @@ def serigraph_mod(imgfile, func, paramspace, size, basename, savedir):
 		params = sample_from_dict(paramspace)
 		im_mod = func(im, **params)
 		savename = '_'.join([basename, random_hex(SERIAL_ID_LENGTH)])
+		savename = savename + '.png'
 		savepath = os.path.join(savedir, savename)
 		save(im_mod, savepath) 
 
@@ -24,5 +25,6 @@ def serigraph_gen(func, paramspace, size, basename, savedir):
 		params = sample_from_dict(paramspace)
 		im_mod = func(**params)
 		savename = '_'.join([basename, random_hex(SERIAL_ID_LENGTH)])
+		savename = savename + '.png'
 		savepath = os.path.join(savedir, savename)
 		save(im_mod, savepath) 
