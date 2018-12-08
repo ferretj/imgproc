@@ -61,12 +61,11 @@ def is_iterable(obj):
 
 
 def is_img_file(file_):
-	if not os.path.isfile(file_):
-		raise IOError('{} does not refer to an existing file.'.format(file_))
-	ext = file_.split('.')[-1]
-	if ext in IMG_EXTS:
-		return True
-	return False
+	try:
+		check_imgfile_arg(file_)
+	except:
+		return False
+	return True
 
 
 def is_rgb_image(obj):
@@ -190,6 +189,10 @@ def check_hexadecimal(obj):
 
 	if not all([is_hexa_char(c) for c in obj]):
 		raise ValueError('Not strictly hexadecimal.')
+
+
+def make_canvas(can_size):
+	return np.full(can_size + (3,), 255, dtype=np.uint8)
 
 
 # see https://stackoverflow.com/questions/123198/how-do-i-copy-a-file-in-python

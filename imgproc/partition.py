@@ -120,9 +120,9 @@ class RegularGridDivider:
 		if self.curr > self.n_cells - 1:
 			raise StopIteration
 		else:
-			i, j = self.curr // self.n_row_cells, self.curr % self.n_row_cells
+			i, j = self.curr // self.n_col_cells, self.curr % self.n_col_cells
 			self.curr += 1
-			return self.bands[i, j]
+			return self.cells[i][j]
 
 	def __getitem__(self, iter_):
 		i, j = iter_
@@ -174,6 +174,11 @@ class RegularGridDivider:
 	def apply_to_all(self, func):
 		for cell in self:
 			cell.apply(func)
+
+	def paint_all(self, col_func):
+		for cell in self:
+			col = col_func()
+			cell.paint(col)
 
 	def stitch(self):
 		canvas = np.zeros_like(self.img)

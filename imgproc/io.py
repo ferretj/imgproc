@@ -6,11 +6,20 @@ import numpy as np
 import os
 from PIL import Image
 
+DEFAULT_DIR = '/Users/joh/Documents/Images/creations'
 
-def list_img_files(dirpath):
+
+def list_files(dirpath, full_path=True):
 	if not os.path.isdir(dirpath):
 		raise IOError('{} does not refer to an existing folder.'.format(dirpath))
-	imgfiles = [file_ for file_ in os.listdir(dirpath) if is_img_file(file_)]
+	if full_path:
+		return [os.path.join(dirpath, file_) for file_ in os.listdir(dirpath)]
+	else:
+		return os.listdir(dirpath)
+
+
+def list_img_files(dirpath, full_path=True):
+	imgfiles = [file_ for file_ in list_files(dirpath, full_path) if is_img_file(file_)]
 	return imgfiles
 
 
@@ -52,6 +61,12 @@ def display_info(imgfile, img=None):
 	print('True format :     {}'.format(ftype))
 	print('Dimensions :   {} x {}'.format(*fdim))
 	print('Size of file : {} {}'.format(fsize, size_descr))
+
+
+def default_dir(foldname=None):
+	if foldname is not None:
+		return os.path.join(DEFAULT_DIR, foldname)
+	return DEFAULT_DIR
 
 
 #TODO: write savefile check to a utils function ??

@@ -15,12 +15,35 @@ def sampling_amount(size):
 		raise TypeError('size argument should be an int or an iterable.')
 
 
-def sample_from_array(elems, size=1, weights=None):
-	if weights is not None and len(elems) != len(weights):
-		raise IndexError('Must have as many elements as weights.')
+# generalization of np.random.choice to array with arbitrary dimensionality
+def choice_multidim(elems, size=1, p=None, axis=0):
+	if isinstance(elems, list):
+		elems = np.array(elems)
+	n = elems.shape[axis]
+	n_samples = sampling_amount(size)
+	if p is not None:
+		assert is_iterable(p)
+		assert len(p) == n
+	indices = np.random.choice(np.arange(n), size=n_samples, p=p)
 	if size == 1:
-		return np.random.choice(elems)
-	return list(np.random.choice(elems, size=size, p=weights))
+		return np.take(elems, indices[0], axis=axis)
+	return np.array([np.take(elems, ind, axis=axis) for ind in indices])
+
+
+def sample_from_array(elems, size=1, weights=None):
+	if not elems:
+		raise IndexError('elems argument must be non-empty.')
+	elif weights is not None and len(elems) != len(weights):
+		raise IndexError('Must have as many elements as weights.')
+	
+	if is_iterable(elems[0]):
+		choice = choice_multidim
+	else:
+		choice = np.random.choice
+	
+	if size == 1:
+		return choice(elems)
+	return list(choice(elems, size=size, p=weights))
 
 
 def sample_from_arrays_alternating(elems, size=1):
