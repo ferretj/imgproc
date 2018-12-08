@@ -8,6 +8,7 @@ import shutil
 
 GOLD_NB = (1. + math.sqrt(5)) / 2
 HEX_CHARS = [str(d) for d in range(10)] + list('abcdef')
+IMG_EXTS = ['jpg', 'png']
 JPG_ALIASES = ['jpg', 'jpeg', 'JPG', 'JPEG']
 PNG_ALIASES = ['png', 'PNG']
 
@@ -33,16 +34,22 @@ def pil_to_numpy(pil_img, from_grayscale=False):
 	return img
 
 
-def is_color(col):
-	if not is_iterable(col):
-		return False
-	elif len(col) != 3:
-		return False
-	elif np.min(col) < 0:
-		return False
-	elif np.max(col) > 255:
-		return False
-	return True
+def has_values_in_range(arr, vmin=0, vmax=256):
+	m, mx = np.min(arr), np.max(arr)
+	if m >= vmin and mx < vmax:
+		return True
+	return False
+
+
+def is_color(obj):
+	if is_iterable(obj):
+		if len(obj) == 3 and has_values_in_range(obj):
+			return True
+	return False
+
+
+def is_pixel(obj):
+	return is_color(obj)
 
 
 def is_iterable(obj):
@@ -51,6 +58,15 @@ def is_iterable(obj):
 		return True
 	except TypeError:
 		return False
+
+
+def is_img_file(file_):
+	if not os.path.isfile(file_):
+		raise IOError('{} does not refer to an existing file.'.format(file_))
+	ext = file_.split('.')[-1]
+	if ext in IMG_EXTS:
+		return True
+	return False
 
 
 def is_rgb_image(obj):
@@ -129,6 +145,10 @@ def check_color(col):
 		raise TypeError('Invalid color argument.')
 
 
+def check_pixel(obj):
+	check_color(obj)
+
+
 #TODO: add PIL format into account if needed
 def check_img_arg(img):
 	if not is_rgb_image(img):
@@ -193,6 +213,30 @@ def hex_chars():
 	return HEX_CHARS
 
 
+def string_hash(obj):
+	if is_rgb_image(obj):
+		return [rgb_to_hex(obj[i, j]) for i in range(obj.shape[0]) for j in range(obj.shape[1])]
+	elif is_pixel(obj):
+		return rgb_to_hex(obj)
+	else:
+		raise TypeError('obj argument should be an image or a pixel value.')
+
+
+def num_hash(obj):
+	if is_rgb_image(obj):
+		return obj[:, :, 0] + 256 * obj[:, :, 1] + (256 ** 2) * obj[:, :, 2]
+	elif is_pixel(obj):
+		return obj[0] + 256 * obj[1] + (256 ** 2) * obj[2]
+	else:
+		raise TypeError('obj argument should be an image or a pixel value.')
+
+
 def img_to_2d_num_hash(img):
 	check_img_arg(img)
-	return img[..., 0] + 256 * img[..., 1] + (256 ** 2) * img[..., 2]
+	return num_hash(img)
+
+
+# see https://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
+def img_to_luminance(img):
+	check_img_arg(img)
+	return 0.2126 * img[:, :, 0] + 0.7152 * img[:, :, 1] + 0.0722 * img[:, :, 2]

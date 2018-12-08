@@ -1,4 +1,4 @@
-from imgproc.utils import (check_img_arg, check_imgfile_arg, identify_format,
+from imgproc.utils import (check_img_arg, check_imgfile_arg, is_img_file, identify_format,
 						   identify_dimensions, identify_filesize, pil_to_numpy)
 import math
 import matplotlib
@@ -7,11 +7,18 @@ import os
 from PIL import Image
 
 
+def list_img_files(dirpath):
+	if not os.path.isdir(dirpath):
+		raise IOError('{} does not refer to an existing folder.'.format(dirpath))
+	imgfiles = [file_ for file_ in os.listdir(dirpath) if is_img_file(file_)]
+	return imgfiles
+
+
 def load_rgb(imgfile, show_info=False):
 	check_imgfile_arg(imgfile)
 	img = pil_to_numpy(Image.open(imgfile)) 
 	if img.ndim == 2:
-		raise ValueError('Numpy array has two dimensions only')
+		raise ValueError('Numpy array has two dimensions only.')
 	elif img.ndim == 3:
 		if show_info:
 			display_info(imgfile, img=img)
@@ -55,3 +62,12 @@ def save(img, savefile):
 		print('WARNING: creating directory {}'.format(savedir))
 		os.mkdir(savedir)
 	matplotlib.image.imsave(savefile, img)
+
+
+def write_text(text, savefile):
+	savedir = os.path.dirname(savefile)
+	if not os.path.isdir(savedir):
+		print('WARNING: creating directory {}'.format(savedir))
+		os.mkdir(savedir)
+	with open(savefile, 'w') as f:
+		f.write(text)

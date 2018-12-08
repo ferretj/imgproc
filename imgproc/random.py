@@ -37,8 +37,11 @@ def sample_from_arrays_alternating(elems, size=1):
 
 def _sample_from_dict_once(d):
 	dres = dict()
-	for item, elems in d.items():
-		dres[item] = np.random.choice(elems)
+	for item, val in d.items():
+		if is_iterable(val):
+			dres[item] = np.random.choice(val)
+		else:
+			dres[item] = val 
 	return dres
 
 

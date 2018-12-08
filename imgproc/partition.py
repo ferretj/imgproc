@@ -124,7 +124,8 @@ class RegularGridDivider:
 			self.curr += 1
 			return self.bands[i, j]
 
-	def __getitem__(self, i, j):
+	def __getitem__(self, iter_):
+		i, j = iter_
 		if i > self.n_row_cells - 1:
 			raise IndexError('Exceeded actual amount of cells per row.')
 		elif j > self.n_col_cells - 1:
@@ -155,7 +156,7 @@ class RegularGridDivider:
 	def _check_cell_size(self):
 		if not is_iterable(self.cell_size):
 			raise TypeError('Cell size should be an iterable.')
-		elif len(cell_size) != 2:
+		elif len(self.cell_size) != 2:
 			raise IndexError('Cell size should have a length of 2.')
 		elif self.img.shape[0] % self.cell_size[0] != 0:
 			raise IndexError('Image has height that is undivisible by cell size.')
@@ -163,7 +164,7 @@ class RegularGridDivider:
 			raise IndexError('Image has width that is undivisible by cell size.')
 
 	def _divide_into_cells(self):
-		return [[self._get_cell(i, j) for i in range(self.n_row_cells)] for j in range(self.n_col_cells)]
+		return [[self._get_cell(i, j) for j in range(self.n_col_cells)] for i in range(self.n_row_cells)]
 
 	def _get_cell(self, i, j):
 		nr, nc = self.n_row_cells, self.n_col_cells
@@ -179,5 +180,5 @@ class RegularGridDivider:
 		sr, sc = self.cell_size
 		for i in range(self.n_row_cells):
 			for j in range(self.n_col_cells):
-				canvas[i * sr: (i + 1) * sr, j * sc: (j + 1) * sc] = self.cells[i][j]
+				canvas[i * sr: (i + 1) * sr, j * sc: (j + 1) * sc] = self.cells[i][j].img
 		return canvas

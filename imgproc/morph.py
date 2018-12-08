@@ -172,7 +172,7 @@ def sort(img, key, order='increasing'):
 
 
 # from https://twitter.com/kGolid/status/1060841706105507840
-def pixelsort(img)
+def pixelsort(img):
 	# select some starting pixel pst
 	# draw randomly from neighborhood of processed pixels
 	# pick the farthest from pst -> P
