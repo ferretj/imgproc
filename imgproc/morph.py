@@ -1,6 +1,6 @@
 from copy import deepcopy
-from imgproc.scan import background_color, num_hash
-from imgproc.utils import numpy_to_pil, pil_to_numpy
+from imgproc.scan import background_color
+from imgproc.utils import numpy_to_pil, pil_to_numpy, num_hash
 import numpy as np
 from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 

@@ -139,13 +139,17 @@ def hex_to_rgb(hexa):
 	return tuple(hex_to_num(hexa[i: i + 2]) for i in (0, 2 ,4))
 
 
-def check_color(col):
+def check_color(col, to_numpy=False):
 	if not is_color(col):
 		raise TypeError('Invalid color argument.')
+	if to_numpy:
+		return np.array(col)
 
 
-def check_pixel(obj):
-	check_color(obj)
+def check_pixel(obj, to_numpy=False):
+	col = check_color(obj, to_numpy=to_numpy)
+	if to_numpy:
+		return col
 
 
 #TODO: add PIL format into account if needed
@@ -232,6 +236,12 @@ def num_hash(obj):
 		return obj[0] + 256 * obj[1] + (256 ** 2) * obj[2]
 	else:
 		raise TypeError('obj argument should be an image or a pixel value.')
+
+
+def num_hash_to_rgb(obj):
+	if not isinstance(obj, int):
+		raise TypeError('Input should be an integer.')
+	return np.array([obj % 256, (obj % (256 ** 2)) // 256 , obj // (256 ** 2)])
 
 
 def img_to_2d_num_hash(img):

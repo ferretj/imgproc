@@ -5,6 +5,7 @@ import matplotlib
 import numpy as np
 import os
 from PIL import Image
+import shutil
 
 DEFAULT_DIR = '/Users/joh/Documents/Images/creations'
 
@@ -21,6 +22,12 @@ def list_files(dirpath, full_path=True):
 def list_img_files(dirpath, full_path=True):
 	imgfiles = [file_ for file_ in list_files(dirpath, full_path) if is_img_file(file_)]
 	return imgfiles
+
+
+def load_folder_imgs(dirpath):
+	imgfiles = list_img_files(dirpath)
+	imgs = [load_rgb(imgfile) for imgfile in imgfiles]
+	return imgs, imgfiles
 
 
 def load_rgb(imgfile, show_info=False):
@@ -86,3 +93,8 @@ def write_text(text, savefile):
 		os.mkdir(savedir)
 	with open(savefile, 'w') as f:
 		f.write(text)
+
+
+def erase_folder_contents(dirpath):
+	shutil.rmtree(dirpath)
+	os.makedirs(dirpath)

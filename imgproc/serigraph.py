@@ -1,4 +1,4 @@
-from imgproc.io import load_rgb, save, write_text
+from imgproc.io import erase_folder_contents, load_rgb, save, write_text
 from imgproc.random import random_hex, sample_from_dict
 import os
 from timeit import default_timer as timer
@@ -27,11 +27,13 @@ def serigraph_summary(savenames, all_params, times):
 
 #TODO: use tmp dir or tempfile ??
 #TODO: add ETA or loading info to be able to cancel 
-def serigraph_mod(imgfile, func, paramspace, size, basename, savedir, budget=None, make_summary=False):
+def serigraph_mod(imgfile, func, paramspace, size, basename, savedir, budget=None, erase_previous=False, make_summary=False):
 	if size is None and budget is None:
 		raise ValueError('Need to specify either size or budget.')
 	elif budget is not None:
 		size = 10000
+	if erase_previous:
+		erase_folder_contents(savedir)
 	im = load_rgb(imgfile)
 	chrono = 0
 	savenames = []
@@ -64,11 +66,13 @@ def serigraph_mod(imgfile, func, paramspace, size, basename, savedir, budget=Non
 
 #TODO: use tmp dir or tempfile ??
 #TODO: add ETA or loading info to be able to cancel
-def serigraph_gen(func, paramspace, basename, savedir, size=None, budget=None, make_summary=False):
+def serigraph_gen(func, paramspace, basename, savedir, size=None, budget=None, erase_previous=False, make_summary=False):
 	if size is None and budget is None:
 		raise ValueError('Need to specify either size or budget.')
 	elif budget is not None:
 		size = 10000
+	if erase_previous:
+		erase_folder_contents(savedir)
 	chrono = 0
 	savenames = []
 	all_params = []

@@ -1,16 +1,16 @@
 from collections import Counter
 from imgproc.utils import (check_img_arg, check_color, hex_to_rgb,
-						   img_to_2d_num_hash, img_to_luminance, string_hash)
+						   img_to_2d_num_hash, img_to_luminance,
+						   num_hash_to_rgb, string_hash)
 import numpy as np
 from scipy.stats import entropy
 
 
 #TODO: case where background color is not the mode pixel
 def background_color(img):
-	check_img_arg(img)
-	h, w = img.shape[:2]
-	mode = Counter(string_hash(img)).most_common(1)[0][0]
-	return np.array(hex_to_rgb(mode))
+    check_img_arg(img)
+    mode = Counter(np.ravel(img_to_2d_num_hash(img))).most_common(1)[0][0]
+    return np.array(num_hash_to_rgb(int(mode)))
 
 
 def color_ratios(img):
@@ -36,12 +36,12 @@ def glob_luminance(img):
 	return np.mean(img_to_luminance(img))
 
 
-def avg_dist_to_color(img, col):
+def dist_to_color(img, col):
 	check_img_arg(img)
-	check_color(col)
-	return np.mean(np.linalg.norm(img - col[np.newaxis, np.newaxis, :]))
+	col = check_color(col, to_numpy=True)
+	return np.linalg.norm(img - col[np.newaxis, np.newaxis, :])
 
 
-def avg_dist_to_mode(img):
+def dist_to_mode(img):
 	mode = background_color(img)
-	return avg_dist_to_color(img, mode)
+	return dist_to_color(img, mode)

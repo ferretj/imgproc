@@ -1,6 +1,6 @@
-from imgproc.io import list_img_files, load_rgb
+from imgproc.io import load_folder_imgs, load_rgb
 from imgproc.render import grid, show
-from imgproc.scan import glob_entropy, glob_luminance, num_colors, avg_dist_to_color, avg_dist_to_mode
+from imgproc.scan import glob_entropy, glob_luminance, num_colors, dist_to_color, dist_to_mode
 from imgproc.utils import identify_filesize
 import numpy as np
 import os
@@ -31,29 +31,28 @@ DEF_FUNCS = [
 	lambda img: -glob_luminance(img),
 	lambda imgfile: identify_filesize(imgfile)[0],
 	lambda imgfile: -identify_filesize(imgfile)[0],
-	lambda img: -avg_dist_to_mode(img),
-	avg_dist_to_mode,
-	lambda img: -avg_dist_to_color(img, (255, 0, 0)),
-	lambda img: -avg_dist_to_color(img, (0, 255, 0)),
-	lambda img: -avg_dist_to_color(img, (0, 0, 255)),
-	lambda img: -avg_dist_to_color(img, (255, 255, 255)),
-	lambda img: -avg_dist_to_color(img, (0, 0, 0)),
+	lambda img: -dist_to_mode(img),
+	dist_to_mode,
+	lambda img: -dist_to_color(img, (255, 0, 0)),
+	lambda img: -dist_to_color(img, (0, 255, 0)),
+	lambda img: -dist_to_color(img, (0, 0, 255)),
+	lambda img: -dist_to_color(img, (255, 255, 255)),
+	lambda img: -dist_to_color(img, (0, 0, 0)),
 ]
 DEF_RANKED = 1
 
 
 #TODO: better pattern to handle img based funcs vs imgfile based funcs 
-def rank_folder_imgs(dirpath, func, k=None, return_scores=False):
+def rank_imgs(imgs, imgfiles, func, k=None, return_scores=False):
 	if k is not None:
 		if not isinstance(k, int):
 			raise TypeError('k should be an integer.')
-	imgfiles = list_img_files(dirpath)
 	scores = []
-	for imgfile in imgfiles:
+	for img, imgfile in zip(imgs, imgfiles):
 		try:
 			scores.append(func(imgfile))
 		except TypeError:
-			scores.append(func(load_rgb(imgfile)))
+			scores.append(func(img))
 	rank_idxs = np.argsort(scores)[::-1]
 	ranked_imgfiles = [imgfiles[ind] for ind in rank_idxs]
 	if k is not None:
@@ -61,12 +60,17 @@ def rank_folder_imgs(dirpath, func, k=None, return_scores=False):
 		rank_idxs = rank_idxs[:k]
 	if return_scores:
 		scores = [scores[ind] for ind in rank_idxs]
-		return ranked_imgfiles, scores
-	return ranked_imgfiles
+		return ranked_imgfiles, scores, rank_idxs
+	return ranked_imgfiles, rank_idxs
+
+
+def rank_folder_imgs(dirpath, func, k=None, return_scores=False):
+	imgs, imgfiles = load_folder_imgs(dirpath)
+	return rank_imgs(imgs, imgfiles, func, k=k, return_scores=return_scores)
 
 
 def rank_grid(dirpath, func, desc, k):
-	ranked_imgfiles, scores = rank_folder_imgs(dirpath, func, k, return_scores=True)
+	ranked_imgfiles, scores, _ = rank_folder_imgs(dirpath, func, k, return_scores=True)
 	imgs = [load_rgb(img) for img in ranked_imgfiles]
 	print('{} :'.format(desc))
 	for rank, (imgfile, score) in enumerate(zip(ranked_imgfiles, scores)):
@@ -74,10 +78,23 @@ def rank_grid(dirpath, func, desc, k):
 	grid(imgs, warn=False)
 
 
-def leaderboard(dirpath, funcs=DEF_FUNCS, descs=DEF_DESCS, k=DEF_RANKED):
+def rank_grid_preload(imgs, imgfiles, func, desc, k):
+	ranked_imgfiles, scores, rank_idxs = rank_imgs(imgs, imgfiles, func, k, return_scores=True)
+	print('{} :'.format(desc))
+	for rank, (imgfile, score) in enumerate(zip(ranked_imgfiles, scores)):
+		print('{}: {} -- score : {}'.format(rank + 1, imgfile, np.abs(score)))
+	grid([imgs[ind] for ind in rank_idxs], warn=False)
+
+
+def leaderboard(dirpath, funcs=DEF_FUNCS, descs=DEF_DESCS, k=DEF_RANKED, preload=False):
+	if preload:
+		imgs, imgfiles = load_folder_imgs(dirpath)
 	exp_name = os.path.basename(dirpath)
 	print('-' * (35 + len(exp_name)))
 	print('|   Leaderboard for experiment {}   |'.format(exp_name))
 	print('-' * (35 + len(exp_name)) + '\n')
 	for func, desc in zip(funcs, descs):
-		rank_grid(dirpath, func, desc, k)
+		if preload:
+			rank_grid_preload(imgs, imgfiles, func, desc, k)
+		else:
+			rank_grid(dirpath, func, desc, k)
