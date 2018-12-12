@@ -31,7 +31,7 @@ def show(img, size=None, redux=1.):
 	plt.show()
 
 
-def _make_grid(imgs, figsize, n_rows, n_cols):
+def _make_grid(imgs, size, n_rows, n_cols):
 	fig = plt.figure(figsize=size)
 	grid = ImageGrid(fig, 111,
 	                 nrows_ncols=(n_rows, n_cols),

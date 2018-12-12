@@ -1,0 +1,10 @@
+[
+    {
+        "name": "GameBoy",
+        "colors": ["#0F380F", "#306230", "#8BAC0F", "#9BBC0F"]
+    },
+    {
+        "name": "GameBoyPocket",
+        "colors": ["#000000", "#545454", "#A9A9A9", "#FFFFFF"]
+    },
+]

@@ -253,3 +253,9 @@ def img_to_2d_num_hash(img):
 def img_to_luminance(img):
 	check_img_arg(img)
 	return 0.2126 * img[:, :, 0] + 0.7152 * img[:, :, 1] + 0.0722 * img[:, :, 2]
+
+
+# path to imgproc base folder
+# see https://stackoverflow.com/questions/4934806/how-can-i-find-scripts-directory-with-python
+def pwd():
+	return os.path.dirname(os.path.dirname(os.path.realpath(__file__))) 

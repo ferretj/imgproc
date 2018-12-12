@@ -2,6 +2,7 @@ from imgproc.utils import (check_img_arg, check_imgfile_arg, is_img_file, identi
 						   identify_dimensions, identify_filesize, pil_to_numpy)
 import math
 import matplotlib
+import matplotlib.image as mplim
 import numpy as np
 import os
 from PIL import Image
@@ -83,7 +84,7 @@ def save(img, savefile):
 	if not os.path.isdir(savedir):
 		print('WARNING: creating directory {}'.format(savedir))
 		os.mkdir(savedir)
-	matplotlib.image.imsave(savefile, img)
+	mplim.imsave(savefile, img)
 
 
 def write_text(text, savefile):

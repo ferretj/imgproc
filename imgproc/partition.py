@@ -106,6 +106,7 @@ class BandDivider:
 
 class RegularGridDivider:
 
+	# cell_size is a tuple/iterable of two elememnts
 	def __init__(self, img, cell_size):
 		self.img = img
 		self.cell_size = cell_size

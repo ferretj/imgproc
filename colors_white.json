@@ -1,0 +1,74 @@
+[
+    {
+        "name": "White",
+        "color": "#FFFFFF"
+    },
+    {
+        "name": "Snow",
+        "color": "#FFFAFA"
+    },
+    {
+        "name": "Honeydew",
+        "color": "#F0FFF0"
+    },
+    {
+        "name": "Mintcream",
+        "color": "#F5FFFA"
+    },
+    {
+        "name": "Azure",
+        "color": "#F0FFFF"
+    },
+    {
+        "name": "Aliceblue",
+        "color": "#F0F8FF"
+    },
+    {
+        "name": "Ghostwhite",
+        "color": "#F8F8FF"
+    },
+    {
+        "name": "Whitesmoke",
+        "color": "#F5F5F5"
+    },
+    {
+        "name": "Seashell",
+        "color": "#FFF5EE"
+    },
+    {
+        "name": "Beige",
+        "color": "#F5F5DC"
+    },
+    {
+        "name": "Oldlace",
+        "color": "#FDF5E6"
+    },
+    {
+        "name": "Floralwhite",
+        "color": "#FFFAF0"
+    },
+    {
+        "name": "Ivory",
+        "color": "#FFFFF0"
+    },
+    {
+        "name": "Antiquewhite",
+        "color": "#FAEBD7"
+    },
+    {
+        "name": "Linen",
+        "color": "#FAF0E6"
+    },
+    {
+        "name": "Lavenderblush",
+        "color": "#FFF0F5"
+    },
+    {
+        "name": "Mistyrose",
+        "color": "#FFE4E1"
+    },
+    {
+        "name": "Navajowhite",
+        "color": "#FFDEAD"
+    }
+]

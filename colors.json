@@ -1,0 +1,58 @@
+[
+    {
+        "name": "Dark Yellow",
+        "color": "#CCCC00"
+    },
+    {
+        "name": "Navy",
+        "color": "#000080"
+    },
+    {
+        "name": "Medium Slate Blue",
+        "color": "#7B68EE"
+    },
+    {
+        "name": "Old Gold",
+        "color": "#CFB53B"
+    },
+    {
+        "name": "Maroon",
+        "color": "#800000"
+    },
+    {
+        "name": "Indigo",
+        "color": "#4B0082"
+    },
+    {
+        "name": "Lavender",
+        "color": "#E6E6FA"
+    },
+    {
+        "name": "Tomato",
+        "color": "#FF6347"
+    },
+    {
+        "name": "Hot Pink",
+        "color": "#FF69B4"
+    },
+    {
+        "name": "Medium Spring Green",
+        "color": "#00FA9A"
+    },
+    {
+        "name": "Chartreuse",
+        "color": "#7FFF00"
+    },
+    {
+        "name": "Dark Turquoise",
+        "color": "#00CED1"
+    },
+    {
+        "name": "Teal",
+        "color": "#008080"
+    },
+    {
+        "name": "Silver",
+        "color": "#C0C0C0"
+    }
+]
