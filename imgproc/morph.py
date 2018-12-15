@@ -144,8 +144,14 @@ def pixelate(img):
 	return img_mod
 
 
-def rotate(img, dg, mode='constant'):
-	return interpolation.rotate(img, dg, mode=mode)
+def rotate(img, dg, mode='constant', keep_dims=False):
+	rot_img = interpolation.rotate(img, dg, mode=mode)
+	if keep_dims:
+		rx, ry = rot_img.shape[:2]
+		hx = (rx - img.shape[0]) // 2
+		hy = (ry - img.shape[1]) // 2
+		return rot_img[hx: rx - hx, hy: ry - hy]
+	return rot_img
 
 
 # similar to numpy sort but with an additional key argument

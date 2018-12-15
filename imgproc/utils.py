@@ -258,4 +258,14 @@ def img_to_luminance(img):
 # path to imgproc base folder
 # see https://stackoverflow.com/questions/4934806/how-can-i-find-scripts-directory-with-python
 def pwd():
-	return os.path.dirname(os.path.dirname(os.path.realpath(__file__))) 
+	return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+
+
+# return indices of all elements that are not in `coll`
+def all_not_in(elems, coll):
+	return [elem for elem in elems if elem not in coll]
+
+
+# return indices of all elements that are not in `coll`
+def index_all_not_in(elems, coll):
+	return [i for i, elem in enumerate(elems) if elem not in coll]

@@ -14,6 +14,10 @@ def complementary_color(rgb):
 	return np.array([hl - c for c in rgb])
 
 
+def negative_color(rgb):
+	return np.array([255 for _ in range(3)]) - rgb 
+
+
 def complement(img):
 	check_img_arg(img)
 	h, w = img.shape[:2]
