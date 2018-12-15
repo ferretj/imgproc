@@ -3,6 +3,7 @@ from imgproc.scan import background_color
 from imgproc.utils import numpy_to_pil, pil_to_numpy, num_hash
 import numpy as np
 from PIL import Image, ImageEnhance, ImageFilter, ImageOps
+from scipy.ndimage import interpolation
 
 
 def modify_vividness(img, factor):
@@ -141,6 +142,10 @@ def pixelate(img):
 	img_mod = img_mod.resize(img_size, Image.BICUBIC)
 	
 	return img_mod
+
+
+def rotate(img, dg, mode='constant'):
+	return interpolation.rotate(img, dg, mode=mode)
 
 
 # similar to numpy sort but with an additional key argument
