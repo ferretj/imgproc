@@ -1,4 +1,4 @@
-from imgproc.io import erase_folder_contents, load_rgb, save, write_text
+from imgproc.io import erase_folder_contents, load_rgb, save, write_text, write_yml
 from imgproc.random import random_hex, sample_from_dict
 import os
 from timeit import default_timer as timer
@@ -6,7 +6,7 @@ from timeit import default_timer as timer
 SERIAL_ID_LENGTH = 6
 
 
-def serigraph_summary(savenames, all_params, times):
+def serigraph_txt_summary(savenames, all_params, times):
 
 	def _summarize_graph(savename, params, time, text=''):
 		text += 'Img {} :\n'.format(savename)
@@ -25,9 +25,30 @@ def serigraph_summary(savenames, all_params, times):
 	return summ
 
 
+def serigraph_yml_summary(savenames, all_params, times):
+
+	def _summarize_graph(savename, params, time, num):
+		key = 'graph_' + str(num)
+		gdata = dict(
+			savename=savename,
+			params=params,
+			time=time,
+		),
+		summary = {key: gdata}
+		return summary
+
+	assert len(all_params) == len(savenames)
+	assert len(all_params) == len(times)
+	summ = {}
+	for num, (savename, params, time) in enumerate(zip(savenames, all_params, times)):
+		new_summ = _summarize_graph(savename, params, time, num)
+		summ = {**summ, **new_summ}
+	return summ
+
+
 #TODO: use tmp dir or tempfile ??
 #TODO: add ETA or loading info to be able to cancel 
-def serigraph_mod(imgfile, func, paramspace, size, basename, savedir, budget=None, erase_previous=False, make_summary=False):
+def serigraph_mod(imgfile, func, paramspace, size, basename, savedir, budget=None, erase_previous=False, make_summary=False, fmt='yml'):
 	if size is None and budget is None:
 		raise ValueError('Need to specify either size or budget.')
 	elif budget is not None:
@@ -57,16 +78,22 @@ def serigraph_mod(imgfile, func, paramspace, size, basename, savedir, budget=Non
 				break
 
 	if make_summary:
-		summ = serigraph_summary(savenames, all_params, times)
-		summfile = '_'.join([basename, 'summary']) + '.txt'
-		summpath = os.path.join(savedir, summfile)
-		write_text(summ, summpath)
+		if fmt == 'txt':
+			summ = serigraph_txt_summary(savenames, all_params, times)
+			summfile = '_'.join([basename, 'summary']) + '.txt'
+			summpath = os.path.join(savedir, summfile)
+			write_text(summ, summpath)
+		else:
+			summ = serigraph_yml_summary(savenames, all_params, times)
+			summfile = '_'.join([basename, 'summary']) + '.yml'
+			summpath = os.path.join(savedir, summfile)
+			write_yml(summ, summpath)
 
 
 
 #TODO: use tmp dir or tempfile ??
 #TODO: add ETA or loading info to be able to cancel
-def serigraph_gen(func, paramspace, basename, savedir, size=None, budget=None, erase_previous=False, make_summary=False):
+def serigraph_gen(func, paramspace, basename, savedir, size=None, budget=None, erase_previous=False, make_summary=False, fmt='yml'):
 	if size is None and budget is None:
 		raise ValueError('Need to specify either size or budget.')
 	elif budget is not None:
@@ -96,7 +123,13 @@ def serigraph_gen(func, paramspace, basename, savedir, size=None, budget=None, e
 				break
 
 	if make_summary:
-		summ = serigraph_summary(savenames, all_params, times)
-		summfile = '_'.join([basename, 'summary']) + '.txt'
-		summpath = os.path.join(savedir, summfile)
-		write_text(summ, summpath)
+		if fmt == 'txt':
+			summ = serigraph_txt_summary(savenames, all_params, times)
+			summfile = '_'.join([basename, 'summary']) + '.txt'
+			summpath = os.path.join(savedir, summfile)
+			write_text(summ, summpath)
+		else:
+			summ = serigraph_yml_summary(savenames, all_params, times)
+			summfile = '_'.join([basename, 'summary']) + '.yml'
+			summpath = os.path.join(savedir, summfile)
+			write_yml(summ, summpath)

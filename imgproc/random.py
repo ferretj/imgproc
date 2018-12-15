@@ -15,6 +15,19 @@ def sampling_amount(size):
 		raise TypeError('size argument should be an int or an iterable.')
 
 
+# np.random.choice but not converting to numpy floats and ints
+def choice_onedim(elems, size=1, p=None):
+	n = len(elems)
+	n_samples = sampling_amount(size)
+	if p is not None:
+		assert is_iterable(p)
+		assert len(p) == n
+	indices = np.random.choice(np.arange(n), size=n_samples, p=p)
+	if size == 1:
+		return elems[indices[0]]
+	return [elems[ind] for ind in indices]
+
+
 # generalization of np.random.choice to array with arbitrary dimensionality
 def choice_multidim(elems, size=1, p=None, axis=0):
 	if isinstance(elems, list):
@@ -39,7 +52,7 @@ def sample_from_array(elems, size=1, weights=None):
 	if is_iterable(elems[0]):
 		choice = choice_multidim
 	else:
-		choice = np.random.choice
+		choice = choice_onedim
 	
 	if size == 1:
 		return choice(elems)
@@ -62,7 +75,7 @@ def _sample_from_dict_once(d):
 	dres = dict()
 	for item, val in d.items():
 		if is_iterable(val):
-			dres[item] = np.random.choice(val)
+			dres[item] = sample_from_array(val)
 		else:
 			dres[item] = val 
 	return dres

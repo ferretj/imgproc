@@ -7,6 +7,7 @@ import numpy as np
 import os
 from PIL import Image
 import shutil
+import yaml
 
 DEFAULT_DIR = '/Users/joh/Documents/Images/creations'
 
@@ -96,6 +97,16 @@ def write_text(text, savefile):
 		f.write(text)
 
 
+def write_yml(dict_, savefile):
+	savedir = os.path.dirname(savefile)
+	if not os.path.isdir(savedir):
+		print('WARNING: creating directory {}'.format(savedir))
+		os.mkdir(savedir)
+	with open(savefile, 'w') as f:
+		yaml.dump(dict_, f, default_flow_style=False)
+
+
 def erase_folder_contents(dirpath):
-	shutil.rmtree(dirpath)
-	os.makedirs(dirpath)
+	if os.path.isdir(dirpath):
+		shutil.rmtree(dirpath)
+		os.makedirs(dirpath)
