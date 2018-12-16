@@ -269,3 +269,7 @@ def all_not_in(elems, coll):
 # return indices of all elements that are not in `coll`
 def index_all_not_in(elems, coll):
 	return [i for i, elem in enumerate(elems) if elem not in coll]
+
+
+def deg_to_rad(d):
+	return (math.pi / 180) * d
