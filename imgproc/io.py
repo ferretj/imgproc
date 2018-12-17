@@ -79,12 +79,15 @@ def default_dir(foldname=None):
 
 
 #TODO: write savefile check to a utils function ??
-def save(img, savefile):
+def save(img, savefile, use_default=False):
 	check_img_arg(img)
-	savedir = os.path.dirname(savefile)
-	if not os.path.isdir(savedir):
-		print('WARNING: creating directory {}'.format(savedir))
-		os.mkdir(savedir)
+	if use_default:
+		savefile = os.path.join(DEFAULT_DIR, savefile)
+	else:
+		savedir = os.path.dirname(savefile)
+		if not os.path.isdir(savedir):
+			print('WARNING: creating directory {}'.format(savedir))
+			os.mkdir(savedir)
 	mplim.imsave(savefile, img)
 
 

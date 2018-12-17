@@ -118,7 +118,7 @@ def map_pixval(img, pix_start, pix_end):
 
 
 #TODO: replace PIL functions by own functions !!
-def pixelate(img):
+def pixelate(img, **kwargs):
 	img_mod = numpy_to_pil(img)
 	img_size = img_mod.size
 
@@ -140,6 +140,8 @@ def pixelate(img):
 
 	# resize to original shape to give pixelated look
 	img_mod = img_mod.resize(img_size, Image.BICUBIC)
+	img_mod = img_mod.convert('RGB')
+	img_mod = pil_to_numpy(img_mod)
 	
 	return img_mod
 
