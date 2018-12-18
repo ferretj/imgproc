@@ -17,6 +17,16 @@ def linear_interp(colors, t):
 	return np.uint8((1. - t) * scol + t * tcol)
 
 
+def quad_interp(colors, t):
+	n_colors = len(colors)
+	interval_bounds = np.linspace(0., 1., n_colors)
+	idx = np.searchsorted(interval_bounds, t)
+	idx += int(idx == 0)
+	scol, tcol = colors[idx - 1], colors[idx]
+	t = (t - interval_bounds[idx - 1]) * (n_colors - 1)
+	return np.uint8((1. - t ** 2) * scol + (t ** 2) * tcol)
+
+
 class ColorGradient:
 
 	def __init__(self, colors, mixfunc=linear_interp, name=None):

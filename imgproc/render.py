@@ -2,6 +2,7 @@ from imgproc.gradients import linear_interp
 from imgproc.utils import make_canvas
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import ImageGrid
+import numpy as np
 
 DEF_CELLSIZE = 6.
 DEF_FIGSIZE = 10.
@@ -88,11 +89,11 @@ def frame(img):
 	return img
 
 
-def show_grad(colors, dims=DEF_GRAD_DIMS):
+def show_grad(colors, grad_func=linear_interp, dims=DEF_GRAD_DIMS):
 	colors = [np.array(col) for col in colors]
 	canvas = make_canvas(dims)
 	d = dims[1]
 	for j in range(d):
 		t = float(j) / (d - 1)
-		canvas[:, j] = linear_interp(colors, t)
+		canvas[:, j] = grad_func(colors, t)
 	show(canvas)
