@@ -113,3 +113,9 @@ def erase_folder_contents(dirpath):
 	if os.path.isdir(dirpath):
 		shutil.rmtree(dirpath)
 		os.makedirs(dirpath)
+
+
+def open_yaml_as_dict(filepath):
+	with open(savefile, 'w') as f:
+		filedict = yaml.load(f)
+	return filedict

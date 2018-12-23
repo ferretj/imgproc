@@ -1,4 +1,5 @@
-from imgproc.io import load_folder_imgs, load_rgb
+from collections import defaultdict
+from imgproc.io import list_files, load_folder_imgs, load_rgb, open_yaml_as_dict
 from imgproc.render import grid, show
 from imgproc.scan import glob_entropy, glob_luminance, num_colors, dist_to_color, dist_to_mode
 from imgproc.utils import identify_filesize
@@ -98,3 +99,43 @@ def leaderboard(dirpath, funcs=DEF_FUNCS, descs=DEF_DESCS, k=DEF_RANKED, preload
 			rank_grid_preload(imgs, imgfiles, func, desc, k)
 		else:
 			rank_grid(dirpath, func, desc, k)
+
+
+# assumption : all parameters subspaces are discrete
+# what we should get as input (summary) :
+# - paramspace (represent it in a separate YAML file ?)
+# what is interesting to know :
+# - which param values are dominant among the chosen ones (in proportion)
+# - which param values are never chosen / which param values are always discarded
+# - param -- %.2f correlation with binary target (chosen / discarded)
+# - param :: value -- sampled %n times, chosen %n times (%n\% of the chosen), discarded %n times (%n\% of the discarded)
+def param_analysis(dirpath, exp_name, indices, fmt='yml'):
+	if fmt == 'yml':
+		pspace_file = os.path.join(dirpath, '{}_paramspace.yml'.format(exp_name))
+		summary_file = os.path.join(dirpath, '{}_summary.yml'.format(exp_name))
+		paramspace = open_yaml_as_dict(pspace_file)
+		summary = open_yaml_as_dict(summary_file)
+	else:
+		raise NotImplementedError
+	n_exps = len(list_files(dirpath))
+	pos_param_counts, neg_param_counts = [defaultdict(defaultdict(int)) for _ in range(2)]
+	for i in range(n_exps):
+		params = summary['graph_{}'.format(i)]['params']
+		for param, value in params.items():
+			if i in indices:
+				pos_param_counts[param][value] += 1
+			else:
+				neg_param_counts[param][value] += 1
+	for param, values in paramspace.items():
+		correlation = param_correlation(param, indices)
+		print('{} -- {.2f} correlation with binary target (chosen / discarded)'.format())
+		for value in values:
+			value_info = ('{} :: {} -- sampled {} times, chosen {} times ({}% of the chosen), ',
+			              'discarded {} times ({}% of the discarded)')
+			value_info = ''.join(value_info)
+			value_count_pos = pos_param_counts[param][value]
+			value_count_neg = neg_param_counts[param][value]
+			value_count = value_count_pos + value_count_neg
+			print(value_info.format(param, value, value_count, value_count_pos,
+									value_ratio_pos, value_count_neg, value_ratio_neg))
+	return pos_param_counts, neg_param_counts
