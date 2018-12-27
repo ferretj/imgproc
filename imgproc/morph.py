@@ -209,3 +209,11 @@ def pixelsort(img):
 	img_mod[src[0], src[1]], img_mod[dst[0], dst[1]] = img_mod[dst[0], dst[1]], img_mod[src[0], src[1]]
 	proc.add(src)
 	unproc.remove(src)
+
+
+def shuffle_pixels(img):
+	h, w = img.shape[:2]
+	pixels = img.reshape((h * w, -1))
+	np.random.shuffle(pixels)
+	img_mod = pixels.reshape(img.shape)
+	return img_mod
