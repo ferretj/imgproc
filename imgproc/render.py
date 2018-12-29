@@ -10,8 +10,8 @@ DEF_GRAD_DIMS = (1000, 2000)
 DEF_TWOSIZE = 9.
 
 
-def infer_size(img, def_size, redux=1., constrain_max=False):
-	h, w = img.shape[:2]
+def infer_size(dims, def_size, redux=1., constrain_max=False):
+	h, w = dims
 	aspect_ratio = float(w) / h
 	if aspect_ratio >= 1.:
 		if constrain_max:
@@ -24,11 +24,15 @@ def infer_size(img, def_size, redux=1., constrain_max=False):
 	return size
 
 
+def infer_size_from_img(img, def_size, redux=1., constrain_max=False):
+	return infer_size(img.shape[:2], def_size, redux=redux, constrain_max=constrain_max)
+
+
 def show(img, size=None, redux=1.):
 	if img.ndim == 2:
 		print('WARNING: colormap applied (since displaying a two-dim image)')
 	if size is None:
-		size = infer_size(img, DEF_FIGSIZE, redux)
+		size = infer_size_from_img(img, DEF_FIGSIZE, redux)
 	plt.figure(figsize=size)
 	plt.imshow(img)
 	plt.tick_params(left=None, bottom=None, labelleft=None, labelbottom=None)
@@ -58,7 +62,7 @@ def view_two(imgs, size=None, redux=1.):
 		show(imgs[0], size=size, redux=redux)
 	else:
 		if size is None:
-			cell_size = infer_size(imgs[0], DEF_TWOSIZE, redux, constrain_max=True)
+			cell_size = infer_size_from_img(imgs[0], DEF_TWOSIZE, redux, constrain_max=True)
 			size = (cell_size[0] * 2, cell_size[1])
 		_make_grid(imgs[:2], size, 1, 2)
 
@@ -78,7 +82,7 @@ def grid(imgs, size=None, redux=1., warn=True):
 	else:
 		k = n // 3 + int(n % 3 != 0)
 		if size is None:
-			cell_size = infer_size(imgs[0], DEF_CELLSIZE, redux, constrain_max=True)
+			cell_size = infer_size_from_img(imgs[0], DEF_CELLSIZE, redux, constrain_max=True)
 			size = (cell_size[0] * 3, cell_size[1] * k)
 		_make_grid(imgs, size, k, 3)
 
@@ -97,3 +101,28 @@ def show_grad(colors, grad_func=linear_interp, dims=DEF_GRAD_DIMS):
 		t = float(j) / (d - 1)
 		canvas[:, j] = grad_func(colors, t)
 	show(canvas)
+
+
+# by default, axes origin is on the bottom left corner.
+# match_image_coords displays dots with origin in top left corner and x/y-axis inverted (to match image display).
+def display_dots(coords, canvas_size=None, redux=1., match_image_coords=False):
+	if isinstance(coords, list):
+		coords = np.array(coords)
+	assert coords.ndim == 2
+	assert coords.shape[1] == 2
+	if canvas_size is None:
+		h = np.max([x for x, _ in coords])
+		w = np.max([y for _, y in coords])
+		canvas_size = (h, w)
+	size = infer_size(canvas_size, DEF_FIGSIZE, redux)
+	plt.figure(figsize=size)
+	if match_image_coords:
+		plt.scatter(coords[:, 1], canvas_size[0] - coords[:, 0])
+		plt.xlim(0, canvas_size[1])
+		plt.ylim(0, canvas_size[0])
+	else:
+		plt.scatter(coords[:, 0], coords[:, 1])
+		plt.xlim(0, canvas_size[0])
+		plt.ylim(0, canvas_size[1])
+	plt.tick_params(left=None, bottom=None, labelleft=None, labelbottom=None)
+	plt.show()

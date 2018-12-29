@@ -1,6 +1,8 @@
+from collections import defaultdict
 from copy import deepcopy
-from imgproc.utils import check_color, is_iterable
+from imgproc.utils import check_color, is_iterable, make_canvas
 import numpy as np
+from sklearn.neighbors import NearestNeighbors
 
 
 # defines a rectangular patch of image that can be represented as a numpy array
@@ -318,8 +320,126 @@ class CircularDivider:
 		for cell in self:
 			cell.apply(func)
 
+	def paint_all(self, col_func):
+		for cell in self:
+			col = col_func()
+			cell.paint(col)
+
 	def stitch(self):
 		canvas = deepcopy(self.img)
 		for cell in self:
 			canvas[cell.rows, cell.cols] = cell.vals
 		return canvas
+
+
+class ArbitraryDivider:
+
+    def __init__(self, img, cell_rows, cell_cols):
+        self.img = img
+        self.cell_rows = cell_rows
+        self.cell_cols = cell_cols
+        self._check_non_overlapping()
+        self._check_complete()
+        self.cells = self._divide_into_cells()
+        self._curr = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._curr > self.n_cells - 1:
+            self._curr = 0
+            raise StopIteration
+        else:
+            self._curr += 1
+            return self.cells[self._curr - 1]
+
+    def __getitem__(self, i):
+        if i > self.n_cells - 1:
+            raise IndexError('Exceeded actual amount of cells.')
+        return self.cells[i]
+
+    def __len__(self):
+        return self.n_cells
+
+    @property
+    def n_cells(self):
+        assert len(self.cell_rows) == len(self.cell_cols)
+        return len(self.cell_rows)
+    
+    def _concat(self, cell_rows, cell_cols):
+        all_elems = []
+        for row_arr, col_arr in zip(cell_rows, cell_cols):
+            all_elems.extend(list(zip(row_arr, col_arr)))
+        return all_elems
+    
+    def _check_non_overlapping(self):
+        all_elems = self._concat(self.cell_rows, self.cell_cols)
+        if len(all_elems) != len(set(all_elems)):
+            n_overlap = len(all_elems) - len(set(all_elems))
+            raise ValueError('Overlapping elements detected ({}).'.format(n_overlap))
+    
+    def _check_complete(self):
+        all_elems = self._concat(self.cell_rows, self.cell_cols)
+        n_pixels = np.prod(self.img.shape[:2])
+        if len(all_elems) != n_pixels:
+            n_missing = n_pixels - len(all_elems)
+            raise ValueError('Missing elements detected ({}).'.format(n_missing))
+
+    def _divide_into_cells(self):
+        return [self._get_cell(i) for i in range(self.n_cells)]
+
+    def _get_cell(self, i):
+        rows, cols = self.cell_rows[i], self.cell_cols[i]
+        vals = np.array([self.img[r, c] for r, c in zip(rows, cols)])
+        return Cell(vals, rows, cols)
+
+    def apply_to_all(self, func):
+        for cell in self:
+            cell.apply(func)
+    
+    def paint_all(self, col_func):
+        for cell in self:
+            col = col_func()
+            cell.paint(col)
+
+    def stitch(self):
+        canvas = deepcopy(self.img)
+        for cell in self:
+            canvas[cell.rows, cell.cols] = cell.vals
+        return canvas
+
+
+class VoronoiDivider(ArbitraryDivider):
+
+    def __init__(self, img, coords, k, ordered=True):
+        cell_rows, cell_cols = self._voronoi(img, coords, k, ordered)
+        super().__init__(img, cell_rows, cell_cols)
+    
+    def _grid_coords(self, grid_size):
+        return np.array(np.meshgrid(np.arange(grid_size[0]),
+                                    np.arange(grid_size[1]))).T.reshape(-1, 2)
+    
+    def _ordered_tuple(self, elems):
+        elems.sort()
+        return tuple(elems)
+
+    def _voronoi(self, img, coords, k, ordered):
+        h, w = img.shape[:2]
+        if isinstance(coords, list):
+            coords = np.array(coords)
+        nbrs = NearestNeighbors(n_neighbors=k).fit(coords)
+        img_coords = self._grid_coords((h, w))
+        _, indices = nbrs.kneighbors(img_coords)
+        if ordered:
+            indices = [self._ordered_tuple(idxs) for idxs in indices]
+        else:
+            indices = [tuple(idxs) for idxs in indices]
+        cell_rows = defaultdict(list)
+        cell_cols = defaultdict(list)
+        for coords, idx in zip(img_coords, indices):
+            cell_rows[idx].append(coords[0])
+            cell_cols[idx].append(coords[1])
+        cell_rows = [cell_rows[idx] for idx in set(indices)]
+        cell_cols = [cell_cols[idx] for idx in set(indices)]
+        return cell_rows, cell_cols

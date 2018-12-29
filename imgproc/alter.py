@@ -1,6 +1,7 @@
 from imgproc.utils import deg_to_rad, numpy_to_pil, pil_to_numpy
 import math
 from PIL import ImageDraw
+#TODO: use aggdraw !!
 
 
 def invert_iterable(iter_):
