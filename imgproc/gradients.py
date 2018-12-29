@@ -40,9 +40,16 @@ class ColorGradient:
 		colors = [np.array(hex_to_rgb(col)) for col in jdict['colors']]
 		return cls(colors, mixfunc, name)
 
+	@property
+	def num_colors(self):
+		return len(self.colors)
+
 	# t is a float in [0, 1]
 	def get_color(self, t):
 		return self.mixfunc(self.colors, t)
+
+	def sample_color(self):
+		return sample_from_array(self.colors)
 
 
 def fetch_gradient(name, grad_file=DEF_GRAD_FILE):

@@ -99,3 +99,7 @@ def random_hex(size):
 
 def random_color():
 	return np.random.randint(256, size=(3,))
+
+
+def random_grayscale():
+	return np.array([random.randint(0, 255)] * 3)
