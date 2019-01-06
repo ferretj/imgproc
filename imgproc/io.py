@@ -37,8 +37,8 @@ def load_folder_imgs_from_nameparts(dirpath, nameparts):
 	def has_tag_among(imgfile, nameparts):
 		return any([namepart in imgfile for namepart in nameparts])
 
-	imgfiles = list_img_files(dirpath)
-	imgs = [load_rgb(imgfile) for imgfile in imgfiles if has_tag_among(imgfile, nameparts)]
+	imgfiles = [imgfile for imgfile in list_img_files(dirpath) if has_tag_among(imgfile, nameparts)]
+	imgs = [load_rgb(imgfile) for imgfile in imgfiles]
 	return imgs, imgfiles
 
 

@@ -44,7 +44,7 @@ def choice_multidim(elems, size=1, p=None, axis=0):
 
 
 def sample_from_array(elems, size=1, weights=None):
-	if not elems:
+	if len(elems) == 0:
 		raise IndexError('elems argument must be non-empty.')
 	elif weights is not None and len(elems) != len(weights):
 		raise IndexError('Must have as many elements as weights.')

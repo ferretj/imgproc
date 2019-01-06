@@ -196,7 +196,18 @@ def check_hexadecimal(obj):
 
 
 def make_canvas(can_size, fill_value=255):
-	return np.full(can_size + (3,), fill_value, dtype=np.uint8)
+	if is_color(fill_value):
+		fill_value = np.array(fill_value)[np.newaxis, np.newaxis, :]
+		return np.tile(fill_value, can_size + (1,)).astype(np.uint8)
+	elif isinstance(fill_value, int):
+		return np.full(can_size + (3,), fill_value, dtype=np.uint8)
+	else:
+		raise TypeError('`fill_value` is supposed to be a RGB color array or an integer pixel value.')
+
+
+def make_patch(patch_size, color):
+	tiling_size = tuple(patch_size) + (1,)
+	return np.tile(color, tiling_size)
 
 
 # see https://stackoverflow.com/questions/123198/how-do-i-copy-a-file-in-python
