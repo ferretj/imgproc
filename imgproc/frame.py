@@ -25,3 +25,19 @@ def width_reduce(img, frame_width):
 	size = img.shape[:2]
 	framed_img = deepcopy(img[:, fw: size[1] - fw])
 	return framed_img
+
+
+# assumption : images share same size
+def build_grid(imgs, n_rows, n_cols):
+	assert isinstance(imgs, list)
+	assert n_rows * n_cols >= len(imgs)
+	h, w = imgs[0].shape[:2]
+	grid_size = (h * n_rows, w * n_cols)
+	grid = make_canvas(grid_size)
+	for i in range(h):
+		for j in range(w):
+			curr = i * n_cols + j
+			if curr >= len(imgs):
+				break
+			grid[i * h: (i + 1) * h, j * w: (j + 1) * w] = imgs[curr]
+	return grid

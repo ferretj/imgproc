@@ -48,7 +48,7 @@ def _make_grid(imgs, size, n_rows, n_cols):
 	                 share_all=True)
 	for i in range(len(imgs)):
 		grid[i].imshow(imgs[i])
-	plt.tick_params(left=None, bottom=None, labelleft=None, labelbottom=None)
+		grid[i].tick_params(left=None, bottom=None, labelleft=None, labelbottom=None)
 	plt.show()
 
 

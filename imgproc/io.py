@@ -32,6 +32,16 @@ def load_folder_imgs(dirpath):
 	return imgs, imgfiles
 
 
+def load_folder_imgs_from_nameparts(dirpath, nameparts):
+
+	def has_tag_among(imgfile, nameparts):
+		return any([namepart in imgfile for namepart in nameparts])
+
+	imgfiles = list_img_files(dirpath)
+	imgs = [load_rgb(imgfile) for imgfile in imgfiles if has_tag_among(imgfile, nameparts)]
+	return imgs, imgfiles
+
+
 def load_rgb(imgfile, show_info=False):
 	check_imgfile_arg(imgfile)
 	img = pil_to_numpy(Image.open(imgfile)) 
@@ -52,6 +62,11 @@ def load_rgb(imgfile, show_info=False):
 				raise ValueError('Detected transparency layer.')
 	else:
 		raise ValueError('Numpy array has more than 3 dimensions.')
+
+
+def load_several_rgb(imgfiles, show_info=False):
+	imgs = [load_rgb(imgfile, show_info=show_info) for imgfile in imgfiles]
+	return imgs
 
 
 # if img is not given, infer all from image file

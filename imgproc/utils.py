@@ -195,8 +195,8 @@ def check_hexadecimal(obj):
 		raise ValueError('Not strictly hexadecimal.')
 
 
-def make_canvas(can_size):
-	return np.full(can_size + (3,), 255, dtype=np.uint8)
+def make_canvas(can_size, fill_value=255):
+	return np.full(can_size + (3,), fill_value, dtype=np.uint8)
 
 
 # see https://stackoverflow.com/questions/123198/how-do-i-copy-a-file-in-python
