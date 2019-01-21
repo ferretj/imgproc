@@ -284,3 +284,15 @@ def index_all_not_in(elems, coll):
 
 def deg_to_rad(d):
 	return (math.pi / 180) * d
+
+
+def del_all_selected(elems, indices):
+
+	def decrement_all_greater(indices, elem):
+		for i, ind in enumerate(indices):
+			if ind > elem:
+				indices[i] -= 1
+
+	for idx in indices:
+		del elems[idx]
+		decrement_all_greater(indices, idx)
