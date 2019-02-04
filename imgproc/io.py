@@ -1,3 +1,4 @@
+import imageio
 from imgproc.utils import (check_img_arg, check_imgfile_arg, is_img_file, identify_format,
 						   identify_dimensions, identify_filesize, pil_to_numpy)
 import math
@@ -134,3 +135,20 @@ def open_yaml_as_dict(filepath):
 	with open(savefile, 'w') as f:
 		filedict = yaml.load(f)
 	return filedict
+
+
+# https://stackoverflow.com/questions/753190/programmatically-generate-video-or-animated-gif-in-python
+def save_as_gif(imgs, savefile, use_default=False):
+	if not isinstance(imgs, list):
+		raise TypeError('Expecting a list as first argument.')
+	check_img_arg(imgs[0])
+	if use_default:
+		savefile = os.path.join(DEFAULT_DIR, savefile)
+	else:
+		savedir = os.path.dirname(savefile)
+		if not os.path.isdir(savedir):
+			print('WARNING: creating directory {}'.format(savedir))
+			os.mkdir(savedir)
+	with imageio.get_writer(savefile, mode='I') as writer:
+		for img in imgs:
+			writer.append_data(img)
