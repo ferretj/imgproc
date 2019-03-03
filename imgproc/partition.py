@@ -1,18 +1,29 @@
 from collections import defaultdict
 from copy import deepcopy
 from imgproc.utils import check_color, is_iterable, make_canvas
+import itertools
 import numpy as np
+import random
 from sklearn.neighbors import NearestNeighbors
 
 
 # defines a rectangular patch of image that can be represented as a numpy array
 class Block:
 
-	def __init__(self, img):
+	# coords are coordinates of opposite corners (as a 2D array or alike)
+	def __init__(self, img, coords=None):
 		self.img = img
+		self.coords = coords
 
 	def __len__(self):
 		return len(self.img)
+
+	@property
+	def center(self):
+		if self.coords is None:
+			# raise AttributeError('Need to specify `coords` attribute when defining Block.')
+			return None
+		return np.mean(coords, axis=0)
 
 	@property
 	def shape(self):
@@ -20,11 +31,18 @@ class Block:
 
 	#TODO: mfunc for morphing function ? better name ?
 	def apply(self, mfunc):
-		self.img = mfunc(self.img)
+		self.img = mfunc(self.img, **self._kwargs())
 
 	def paint(self, col):
 		check_color(col)
 		self.img = np.tile(col, (self.shape[0], self.shape[1], 1))
+
+	def _kwargs(self):
+		kwargs = dict(
+			center=self.center, 
+			shape=self.shape,
+		)
+		return kwargs
 
 
 # defines connected group of pixels of arbitrary shape
@@ -221,14 +239,65 @@ class RegularGridDivider:
 		sr, sc = self.block_size
 		return Block(self.img[i * sr: (i + 1) * sr, j * sc: (j + 1) * sc])
 
+	def _random_block_index(self):
+		return (random.randint(0, self.n_row_blocks - 1), random.randint(0, self.n_col_blocks - 1))
+
+	def _random_block_indices(self, num_samples):
+		all_block_indices = list(itertools.product(np.arange(self.n_row_blocks), np.arange(self.n_col_blocks)))
+		samples = np.random.permutation(np.arange(self.n_blocks))[:num_samples]
+		return [all_block_indices[ind] for ind in samples]
+
 	def apply_to_all(self, func):
 		for block in self:
 			block.apply(func)
+
+	def apply_to_random_sample(self, func, num_samples):
+		if isinstance(num_samples, float):
+			if 0. <= num_samples <= 1.:
+				num_samples = int(num_samples * self.n_blocks)
+			else:
+				error = 'Expecting `num_samples` to be an integer or a (0, 1)-float.'
+				raise ValueError(error)
+		indices = self._random_block_indices(num_samples)
+		for (i, j) in indices:
+			self.blocks[i][j].apply(func)
+
+	def apply_to_random(self, func):
+		i, j = self._random_block_index()
+		self.blocks[i][j].apply(func)
+
+	def apply_to_selected(self, indices, func):
+		assert isinstance(indices, list)
+		for (i, j) in indices:
+			self.blocks[i][j].apply(func)
 
 	def paint_all(self, col_func):
 		for block in self:
 			col = col_func()
 			block.paint(col)
+
+	def paint_random_sample(self, col_func, num_samples):
+		if isinstance(num_samples, float):
+			if 0. <= num_samples <= 1.:
+				num_samples = int(num_samples * self.n_blocks)
+			else:
+				error = 'Expecting `num_samples` to be an integer or a (0, 1)-float.'
+				raise ValueError(error)
+		indices = self._random_block_indices(num_samples)
+		for (i, j) in indices:
+			col = col_func()
+			self.blocks[i][j].paint(col)
+
+	def paint_random(self, col_func):
+		i, j = self._random_block_index()
+		col = col_func()
+		self.blocks[i][j].paint(col)
+
+	def paint_selected(self, indices, col_func):
+		assert isinstance(indices, list)
+		for (i, j) in indices:
+			col = col_func()
+			self.blocks[i][j].paint(col)
 
 	def stitch(self):
 		canvas = np.zeros_like(self.img)
