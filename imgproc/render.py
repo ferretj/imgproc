@@ -1,5 +1,6 @@
 from imgproc.gradients import linear_interp
 from imgproc.utils import make_canvas
+from IPython.display import display, Image
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import ImageGrid
 import numpy as np
@@ -126,3 +127,10 @@ def display_dots(coords, canvas_size=None, redux=1., match_image_coords=False):
 		plt.ylim(0, canvas_size[1])
 	plt.tick_params(left=None, bottom=None, labelleft=None, labelbottom=None)
 	plt.show()
+
+
+# WARNING : seems to make notebook crash for big GIFs
+def show_gif_in_notebook(gfile):
+	assert '.gif' in gfile
+	with open(gfile,'rb') as f:
+		display(Image(data=f.read(), format='gif'))
