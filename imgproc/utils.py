@@ -68,6 +68,13 @@ def is_img_file(file_):
 	return True
 
 
+def is_grayscale_image(obj):
+	if hasattr(obj, 'dtype'):
+		if obj.ndim == 2 and obj.dtype == 'uint8':
+			return True
+	return False
+
+
 def is_rgb_image(obj):
 	if hasattr(obj, 'dtype'):
 		if obj.ndim == 3 and obj.dtype == 'uint8':
@@ -153,8 +160,10 @@ def check_pixel(obj, to_numpy=False):
 
 
 #TODO: add PIL format into account if needed
-def check_img_arg(img):
+def check_img_arg(img, allow_grayscale=False):	
 	if not is_rgb_image(img):
+		if allow_grayscale and is_grayscale_image(img):
+			return
 		raise TypeError('Invalid image argument.')
 
 
@@ -195,7 +204,14 @@ def check_hexadecimal(obj):
 		raise ValueError('Not strictly hexadecimal.')
 
 
-def make_canvas(can_size, fill_value=255):
+def make_canvas_2d(can_size, fill_value=255):
+	if isinstance(fill_value, int):
+		return np.full(can_size, fill_value, dtype=np.uint8)
+	else:
+		raise TypeError('`fill_value` is supposed to be an integer pixel value.')
+
+
+def make_canvas_3d(can_size, fill_value=255):
 	if is_color(fill_value):
 		fill_value = np.array(fill_value)[np.newaxis, np.newaxis, :]
 		return np.tile(fill_value, can_size + (1,)).astype(np.uint8)
@@ -203,6 +219,15 @@ def make_canvas(can_size, fill_value=255):
 		return np.full(can_size + (3,), fill_value, dtype=np.uint8)
 	else:
 		raise TypeError('`fill_value` is supposed to be a RGB color array or an integer pixel value.')
+
+
+def make_canvas(can_size, fill_value=255, mode='rgb'):
+	if mode == 'rgb':
+		return make_canvas_3d(can_size, fill_value)
+	elif mode == 'grayscale':
+		return make_canvas_2d(can_size, fill_value)
+	else:
+		raise ValueError("`mode` expected values are 'rgb' or 'grayscale'.")
 
 
 def make_patch(patch_size, color):

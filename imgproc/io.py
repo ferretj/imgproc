@@ -141,7 +141,7 @@ def open_yaml_as_dict(filepath):
 def save_as_gif(imgs, savefile, use_default=False):
 	if not isinstance(imgs, list):
 		raise TypeError('Expecting a list as first argument.')
-	check_img_arg(imgs[0])
+	check_img_arg(imgs[0], allow_grayscale=True)
 	if use_default:
 		savefile = os.path.join(DEFAULT_DIR, savefile)
 	else:
