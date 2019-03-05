@@ -321,3 +321,7 @@ def del_all_selected(elems, indices):
 	for idx in indices:
 		del elems[idx]
 		decrement_all_greater(indices, idx)
+
+
+def stackcopy(array, num_copies, axis=0):
+	return np.stack([array.copy() for _ in range(num_copies)], axis=axis)
