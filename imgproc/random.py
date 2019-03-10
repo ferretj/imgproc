@@ -137,3 +137,7 @@ def random_color():
 
 def random_grayscale():
 	return np.array([random.randint(0, 255)] * 3).astype(np.uint8)
+
+
+def random_position(array):
+	return [random.randint(0, array.shape[dim] - 1) for dim in range(array.ndim)]
