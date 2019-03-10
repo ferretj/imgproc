@@ -1,5 +1,5 @@
 from imgproc.gradients import linear_interp
-from imgproc.utils import make_canvas
+from imgproc.utils import make_canvas, is_color
 from IPython.display import display, Image
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import ImageGrid
@@ -7,6 +7,7 @@ import numpy as np
 
 DEF_CELLSIZE = 6.
 DEF_FIGSIZE = 10.
+DEF_COL_DIMS = (1000, 2000)
 DEF_GRAD_DIMS = (1000, 2000)
 DEF_TWOSIZE = 9.
 
@@ -92,6 +93,19 @@ def grid(imgs, size=None, redux=1., warn=True):
 # ideas : write parameters inside canvas ? write img ID ?
 def frame(img):
 	return img
+
+
+def show_colors(colors):
+    assert isinstance(colors, list)
+    assert is_color(colors[0])
+    num_colors = len(colors)
+    col_factor = DEF_COL_DIMS[1] // num_colors
+    canvas_size = (DEF_COL_DIMS[0], col_factor * num_colors)
+    palette = make_canvas(canvas_size)
+    for j, color in enumerate(colors):
+        color = np.array(color).astype(np.uint8)
+        palette[:, j * col_factor: (j + 1) * col_factor] = color[None, None, :]
+    show(palette)
 
 
 def show_grad(colors, grad_func=linear_interp, dims=DEF_GRAD_DIMS):
